@@ -5,7 +5,14 @@ from swagger_server import util
 import uuid
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from swagger_server.models import db  # SQLAlchemy DB 세션
+# from .. import db  # SQLAlchemy DB 세션
+import connexion
+import uuid
+from swagger_server.models.dme_type_related_capabilities import DmeTypeRelatedCapabilities  # noqa: E501
+from swagger_server import util
+
+# 임시 저장소: 나중에 데이터를 DB로 변경할 때는 여기를 DB로 수정
+capabilities_db = {}
 
 def production_capabilities_post(body):  # noqa: E501
     """production_capabilities_post
@@ -29,21 +36,12 @@ def production_capabilities_post(body):  # noqa: E501
     # body 객체에 registration_id 추가
     body.registration_id = registration_id  # 객체에 ID 추가
 
-    # 데이터베이스 세션 생성
-    session = db.Session()
+    # 임시 저장소에 데이터 저장
+    capabilities_db[registration_id] = body.to_dict()  # registration_id를 키로 사용하여 저장
 
-    try:
-        # DB에 새로운 생산 능력 데이터 저장
-        session.add(body)
-        session.commit()
+    # 등록된 ID와 함께 응답 반환
+    return {
+        "registration_id": registration_id,
+        "message": "Production capability registered successfully"
+    }, 201  # 201 Created
 
-        # 등록된 ID와 함께 응답 반환
-        return {
-            "registration_id": registration_id,
-            "message": "Production capability registered successfully"
-        }, 201  # 201 Created
-    except Exception as e:
-        session.rollback()
-        return {"error": f"Internal Server Error: {str(e)}"}, 500
-    finally:
-        session.close()

@@ -1,28 +1,37 @@
 import connexion
 import six
 
+#임시 저장소
+from .registered_dme_type_production_capabilities_controller import capabilities_db
+
+
 from swagger_server.models.dme_type_related_capabilities import DmeTypeRelatedCapabilities  # noqa: E501
 from swagger_server.models.problem_details import ProblemDetails  # noqa: E501
 from swagger_server.models.registration_id import RegistrationId  # noqa: E501
 from swagger_server import util
 
+def delete_production_capabilities_by_id(registration_id):
+    """등록된 registration_id로 생산 능력 데이터를 삭제"""
+    if registration_id in capabilities_db:
+        del capabilities_db[registration_id]  # 해당 ID의 데이터를 삭제
+        return True
+    return False
 
 def production_capabilities_registration_id_delete(registration_id):  # noqa: E501
     """production_capabilities_registration_id_delete
 
-    To deregister DME type production capabilities # noqa: E501
+    To deregister DME type production capabilities
 
     :param registration_id: 
-    :type registration_id: dict | bytes
+    :type registration_id: str
 
     :rtype: None
     """
-    if connexion.request.is_json:
-        registration_id = RegistrationId.from_dict(connexion.request.get_json())  # noqa: E501
-
-    # 실제 삭제 로직 (예시로 데이터베이스에서 삭제하는 경우)
+    #  if connexion.request.is_json:
+    #     registration_id = RegistrationId.from_dict(connexion.request.get_json())  # noqa: E501
+    ############################# -> dict로 보내면 오류 남 not hashable
     try:
-        # 데이터베이스에서 해당 registration_id로 삭제 작업 수행
+        # 실제 삭제 작업 수행
         deleted = delete_production_capabilities_by_id(registration_id)
         if deleted:
             return {"message": "Production capabilities deleted successfully"}, 200
@@ -30,6 +39,14 @@ def production_capabilities_registration_id_delete(registration_id):  # noqa: E5
             return {"error": "Not found"}, 404
     except Exception as e:
         return {"error": f"Internal Server Error: {str(e)}"}, 500
+
+
+
+
+def get_production_capabilities_by_id(registration_id):
+    """등록된 registration_id로 생산 능력 데이터를 조회"""
+    # capabilities_db에서 registration_id로 데이터를 조회
+    return capabilities_db.get(registration_id)
 
 def production_capabilities_registration_id_get(registration_id):  # noqa: E501
     """production_capabilities_registration_id_get
@@ -50,11 +67,13 @@ def production_capabilities_registration_id_get(registration_id):  # noqa: E501
         production_capability = get_production_capabilities_by_id(registration_id)
 
         if production_capability:
-            return production_capability.to_dict(), 200
+            # DmeTypeRelatedCapabilities 객체로 변환 후 반환
+            return production_capability, 200
         else:
             return {"error": "Not found"}, 404
     except Exception as e:
         return {"error": f"Internal Server Error: {str(e)}"}, 500
+
 
 
 

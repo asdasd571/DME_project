@@ -21,3 +21,22 @@ from swagger_server.models.problem_details import ProblemDetails
 from swagger_server.models.registration_id import RegistrationId
 from swagger_server.models.schema_types import SchemaTypes
 from swagger_server.models.security_method import SecurityMethod
+
+
+# from flask import Flask
+# from flask_sqlalchemy import SQLAlchemy
+# from flask_migrate import Migrate
+
+# app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://nakgeun:12345@db:5432/mydatabase'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # 변경 추적 비활성화
+
+# # Flask-SQLAlchemy 인스턴스를 생성하고 앱에 연결
+# db = SQLAlchemy(app)
+
+# # 마이그레이션 인스턴스 생성
+# migrate = Migrate(app, db)
+
+# # 마이그레이션 초기화 및 적용
+# if __name__ == '__main__':
+#     app.run()
