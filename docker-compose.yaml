@@ -1,7 +1,7 @@
 services:
-  swagger_server:
+  swagger_server_reg:
     build: .
-    container_name: swagger_server
+    container_name: swagger_server_reg
     ports:
       - "8080:8080"
     depends_on:
@@ -11,7 +11,7 @@ services:
     volumes:
       - .:/usr/src/app
     entrypoint: ["python3"]
-    command: ["-m", "swagger_server"]
+    command: ["-m", "swagger_server_reg"]
     networks:
       - app_network  # app_network 추가
 
