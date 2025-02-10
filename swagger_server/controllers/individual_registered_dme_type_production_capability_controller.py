@@ -75,32 +75,44 @@ def production_capabilities_registration_id_get(registration_id):  # noqa: E501
         return {"error": f"Internal Server Error: {str(e)}"}, 500
 
 
+def update_production_capabilities_by_id(registration_id, body):
+    """등록된 registration_id로 생산 능력 데이터를 업데이트"""
+    
+    # capabilities_db에서 registration_id로 기존 데이터 조회
+    if registration_id not in capabilities_db:
+        return None  # 데이터가 없으면 None 반환
+    
+    existing_data = capabilities_db[registration_id]
+    
+    # 기존 데이터를 업데이트
+    existing_data.update(body)  # 기존 데이터에 새 데이터를 덮어씀
+    
+    # 업데이트된 데이터를 다시 저장
+    capabilities_db[registration_id] = existing_data
+    
+    return existing_data
 
 
-def production_capabilities_registration_id_put(body, registration_id):  # noqa: E501
+def production_capabilities_registration_id_put(registration_id, body):  # noqa: E501
     """production_capabilities_registration_id_put
 
-    To update DME type production capabilities that it has previously registered # noqa: E501
+    To update DME type production capabilities that it has previously registered
 
+    :param registration_id: 
+    :type registration_id: str
     :param body: 
     :type body: dict | bytes
-    :param registration_id: 
-    :type registration_id: dict | bytes
 
-    :rtype: DmeTypeRelatedCapabilities
+    :rtype: dict
     """
-    if connexion.request.is_json:
-        body = DmeTypeRelatedCapabilities.from_dict(connexion.request.get_json())  # noqa: E501
-    if connexion.request.is_json:
-        registration_id = RegistrationId.from_dict(connexion.request.get_json())  # noqa: E501
-
-    # 실제 업데이트 로직 (예시로 데이터베이스에서 업데이트하는 경우)
     try:
+        # 실제 업데이트 작업 수행
         updated = update_production_capabilities_by_id(registration_id, body)
         if updated:
-            return updated.to_dict(), 200
+            return updated, 200
         else:
             return {"error": "Not found"}, 404
     except Exception as e:
         return {"error": f"Internal Server Error: {str(e)}"}, 500
+
 
