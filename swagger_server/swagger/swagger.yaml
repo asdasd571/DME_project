@@ -381,6 +381,7 @@ components:
     DmeTypeRelatedCapabilities:
       title: DmeTypeRelatedCapabilities
       required:
+      - registrationId
       - dataAccessEndpoint
       - dataDeliveryModes
       - dmeTypeDefinition
@@ -388,6 +389,10 @@ components:
       properties:
         dmeTypeDefinition:
           $ref: "#/components/schemas/DmeTypeDefinition"
+        registrationId:
+          type: string
+          description: 'A successful registration identified by registrationId '
+
         constraints:
           title: constraints
           type: object
