@@ -23,8 +23,8 @@ def dme_types_dme_type_id_get(dme_type_id):  # noqa: E501
     if connexion.request.is_json:
         dme_type_id = DmeTypeId.from_dict(connexion.request.get_json())  # noqa: E501
 
-    # 여기서 실제 데이터베이스나 서비스와 연동하여 DME 타입 정보를 가져옴
-    # 예시로 더미 데이터를 반환합니다.
+    # 여기서 실제 데이터베이스나 서비스와 연동하여 DME 타입 정보를 가져오기
+    # 더미 데이터
     if dme_type_id:
         response = {
             'dmeTypeId': {
