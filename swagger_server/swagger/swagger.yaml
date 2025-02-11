@@ -1,0 +1,448 @@
+openapi: 3.0.3
+info:
+  title: Data offer service
+  description: |
+    API for Data offer service.
+    © 2024, O-RAN ALLIANCE.
+    All rights reserved.
+  version: 1.0.0-alpha.1
+externalDocs:
+  description: O-RAN.WG2.R1AP-v06.00
+  url: https://www.o-ran.org/specifications
+servers:
+- url: "{apiRoot}/data-offer/v1/{apiConsumerId}"
+  variables:
+    apiRoot:
+      description: apiRoot as defined in clause 5.3 in O-RAN.WG2.R1AP
+      default: http://localhost:8080
+    apiConsumerId:
+      description: Identifier of API Consumer
+      default: ""
+paths:
+  /offers:
+    post:
+      tags:
+      - All data offers
+      description: Allows to create a new data offer
+      operationId: offers_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DataOfferInfo"
+        required: true
+      responses:
+        "201":
+          description: Success case 201 created
+          headers:
+            Location:
+              description: Contains the URI of the newly created resource
+              required: true
+              style: simple
+              explode: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataOfferInfo"
+        "400":
+          $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          $ref: "#/components/schemas/ProblemDetails"
+        "403":
+          $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/schemas/ProblemDetails"
+        "405":
+          $ref: "#/components/schemas/ProblemDetails"
+        "409":
+          $ref: "#/components/schemas/ProblemDetails"
+        "413":
+          $ref: "#/components/schemas/ProblemDetails"
+        "415":
+          $ref: "#/components/schemas/ProblemDetails"
+        "429":
+          $ref: "#/components/schemas/ProblemDetails"
+        "500":
+          $ref: "#/components/schemas/ProblemDetails"
+        "502":
+          $ref: "#/components/schemas/ProblemDetails"
+        "503":
+          $ref: "#/components/schemas/ProblemDetails"
+      callbacks:
+        DataAvailabilityNotification:
+          '{$request.body.dataAvailabilityNotificationUri}':
+            post:
+              description: Notification on the availability of offered data
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: "#/components/schemas/DataAvailabilityNotification"
+                required: true
+              responses:
+                "204":
+                  description: The notification was delivered
+                "400":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "401":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "403":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "404":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "429":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "500":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "502":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "503":
+                  $ref: "#/components/schemas/ProblemDetails"
+        DataOfferTerminationNotification:
+          '{$request.body.dataOfferTerminationNotificationUri}':
+            post:
+              description: Notification on termination of data offer by the API producer
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: "#/components/schemas/DataOfferTerminationNotification"
+                required: true
+              responses:
+                "204":
+                  description: The notification was delivered
+                "400":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "401":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "403":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "404":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "429":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "500":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "502":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "503":
+                  $ref: "#/components/schemas/ProblemDetails"
+      x-openapi-router-controller: swagger_server.controllers.all_data_offers_controller
+  /offers/{dataOfferId}:
+    delete:
+      tags:
+      - Individual data offer
+      description: To delete the data offer
+      operationId: offers_data_offer_id_delete
+      parameters:
+      - name: dataOfferId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "204":
+          description: The data offer was deleted.
+        "400":
+          $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          $ref: "#/components/schemas/ProblemDetails"
+        "403":
+          $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/schemas/ProblemDetails"
+        "429":
+          $ref: "#/components/schemas/ProblemDetails"
+        "500":
+          $ref: "#/components/schemas/ProblemDetails"
+        "502":
+          $ref: "#/components/schemas/ProblemDetails"
+        "503":
+          $ref: "#/components/schemas/ProblemDetails"
+      x-openapi-router-controller: swagger_server.controllers.individual_data_offer_controller
+components:
+  schemas:
+    ServerAddressWithPort:
+      required:
+      - hostname
+      - portAddress
+      type: object
+      properties:
+        hostname:
+          type: string
+          description: "string identifying a hostname shall be formatted according\
+            \ to clause 2.3.1 as defined in IETF RFC 1035 [19]"
+        portAddress:
+          maximum: 65535
+          minimum: 1
+          type: integer
+          description: "Port address, e.g. 9092"
+      description: Server configuration
+      example:
+        hostname: hostname
+        portAddress: 5249
+    StreamingConfigurationKafka:
+      required:
+      - kafkaBootstrapServers
+      - topicName
+      type: object
+      properties:
+        topicName:
+          type: string
+          description: Name of the Kafka topic
+        kafkaBootstrapServers:
+          type: array
+          description: Server configuration
+          items:
+            $ref: "#/components/schemas/ServerAddressWithPort"
+      description: The StreamingConfigurationKafka data type signals a data streaming
+        configuration for the Kafka protocol.
+      example:
+        topicName: topicName
+        kafkaBootstrapServers:
+        - hostname: hostname
+          portAddress: 5249
+        - hostname: hostname
+          portAddress: 5249
+    PushDeliveryDetailsHttp:
+      required:
+      - dataPushUri
+      type: object
+      properties:
+        dataPushUri:
+          $ref: "#/components/schemas/Uri"
+      description: The PushDeliveryDetailsHttp data type signals how to push data
+        using the HTTP protocol.
+      example:
+        dataPushUri: null
+    DataDeliveryMethod:
+      type: string
+      description: This indicates supported delivery method
+      enum:
+      - PULL_HTTP
+      - PUSH_HTTP
+      - STREAMING_KAFKA
+    dmeTypeId:
+      type: string
+      description: "The DmeTypeId is constructed based on the three parts separated\
+        \ by “:“ (colon) {dmeTypeId} = {namespace}:{name}:{version}. See O-RAN.WG2.R1AP_DataRegistration.yaml#/components/schemas/DmeTypeIdStruct\
+        \ for the definition of “namespace“, “name“ and “version“."
+    DataDeliveryMode:
+      type: string
+      description: This indicates whether the data instance is created in a one-time
+        data delivery (data request) or continuously (data subscription)
+      enum:
+      - ONE_TIME
+      - CONTINUOUS
+    Uri:
+      type: string
+      description: "A string formatted according to IETF RFC 3986 [8]."
+    PullDeliveryDetailsHttp:
+      required:
+      - dataPullUri
+      type: object
+      properties:
+        dataPullUri:
+          $ref: "#/components/schemas/Uri"
+      description: The PullDeliveryDetailsHttp data type signals how to pull data
+        using the HTTP protocol.
+      readOnly: true
+      example:
+        dataPullUri: dataPullUri
+    DataAvailabilityNotification:
+      type: object
+      properties:
+        dataJobId:
+          type: string
+          description: data job identifier
+        pullDeliveryDetailsHttp:
+          $ref: "#/components/schemas/PullDeliveryDetailsHttp"
+      description: Avaibility of the data
+    ProblemDetails:
+      title: ProblemDetails
+      type: object
+      properties:
+        type:
+          title: type
+          type: string
+          description: a URI reference according to IETF RFC 3986 that identifies
+            the problem type
+        title:
+          title: title
+          type: string
+          description: human-readable summary of the problem type
+        status:
+          title: status
+          type: number
+          description: the HTTP status code
+        detail:
+          title: detail
+          type: string
+          description: 'human-readable explanation '
+        instance:
+          title: instance
+          type: string
+          description: URI reference that identifies the specific occurrence of the
+            problem
+      description: A problem detail to carry details in an HTTP response according
+        to RFC 7807
+    DataOfferInfo:
+      required:
+      - “ dataDeliveryMethods “
+      - “dataDeliveryMode“
+      - “dataDeliverySchemaIds“
+      - “dataOfferTerminationNotificationUri“
+      - “dmeTypeId“
+      - “productionJobDefinition“
+      type: object
+      properties:
+        dataDeliveryMode:
+          $ref: "#/components/schemas/DataDeliveryMode"
+        dmeTypeId:
+          $ref: "#/components/schemas/dmeTypeId"
+        productionJobDefinition:
+          type: object
+          description: Job description based on the DME type specific dataProductionSchema
+        dataDeliveryMethods:
+          type: array
+          items:
+            $ref: "#/components/schemas/DataDeliveryMethod"
+        dataDeliverySchemaIds:
+          type: array
+          description: A delivery schema identifier provided by a Data Producer during
+            the data registration procedure
+          items:
+            type: string
+        pullDeliveryDetailsHttp:
+          $ref: "#/components/schemas/PullDeliveryDetailsHttp"
+        dataAvailabilityNotificationUri:
+          $ref: "#/components/schemas/Uri"
+        dataOfferTerminationNotificationUri:
+          $ref: "#/components/schemas/Uri"
+        pushDeliveryDetailsHttp:
+          $ref: "#/components/schemas/PushDeliveryDetailsHttp"
+        streamingConfigurationKafka:
+          $ref: "#/components/schemas/StreamingConfigurationKafka"
+      description: Information related to a data offer
+      example:
+        streamingConfigurationKafka:
+          topicName: topicName
+          kafkaBootstrapServers:
+          - hostname: hostname
+            portAddress: 5249
+          - hostname: hostname
+            portAddress: 5249
+        dataDeliveryMode: ONE_TIME
+        dataOfferTerminationNotificationUri: null
+        dataDeliveryMethods:
+        - PULL_HTTP
+        - PULL_HTTP
+        dmeTypeId: dmeTypeId
+        dataDeliverySchemaIds:
+        - dataDeliverySchemaIds
+        - dataDeliverySchemaIds
+        dataAvailabilityNotificationUri: null
+        productionJobDefinition: {}
+        pushDeliveryDetailsHttp:
+          dataPushUri: null
+        pullDeliveryDetailsHttp:
+          dataPullUri: dataPullUri
+    DataOfferTerminationNotification:
+      required:
+      - dataOfferId
+      type: object
+      properties:
+        dataOfferId:
+          type: string
+          description: Identifies the deleted data offer
+      description: Termination of a data offer by the API producer
+  responses:
+    "400":
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "401":
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "403":
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "404":
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "405":
+      description: Method Not Allowed
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "406":
+      description: Not Acceptable
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "409":
+      description: Conflict
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "411":
+      description: Length Required
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "413":
+      description: Payload Too Large
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "415":
+      description: Unsupported Media Type
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "429":
+      description: Too Many Requests
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "500":
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "502":
+      description: Bad Gateway
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "503":
+      description: Service Unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+
