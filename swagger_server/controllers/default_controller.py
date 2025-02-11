@@ -68,27 +68,29 @@ def dme_types_get(identity_namespace=None, identity_name=None, data_category=Non
     # 여기서 실제로 데이터베이스나 서비스에서 DME 타입 목록을 가져옴
     # 예시로 더미 데이터를 반환합니다.
     dme_types = [
-        DmeTypeRelatedCapabilities(
-            registrationId="1234",
-            dmeTypeDefinition=DmeTypeId(namespace="example_namespace", name="example_name", version="1.0.0"),
-            dataAccessEndpoint="http://example.com/api",
-            dataDeliveryModes=["ONE_TIME", "CONTINUOUS"]
-        ),
-        DmeTypeRelatedCapabilities(
-            registrationId="5678",
-            dmeTypeDefinition=DmeTypeId(namespace="example_namespace2", name="example_name2", version="1.0.1"),
-            dataAccessEndpoint="http://example2.com/api",
-            dataDeliveryModes=["ONE_TIME"]
-        )
-    ]
-    
-    # 필터링 기능을 추가하여 검색을 수행할 수 있습니다.
+    DmeTypeRelatedCapabilities(
+        registrationId="1234",
+        dmeTypeDefinition=DmeTypeId(identity_namespace="example_namespace", identity_name="example_name", data_category="1.0.0"),
+        dataAccessEndpoint="http://example.com/api",
+        metadata={'dataCategory': ['PM counters']},  # metadata가 딕셔너리로 정의됨
+        dataDeliveryModes=["ONE_TIME", "CONTINUOUS"]
+    ),
+    DmeTypeRelatedCapabilities(
+        registrationId="5678",
+        dmeTypeDefinition=DmeTypeId(identity_namespace="example_namespace2", identity_name="example_name2", data_category="1.0.1"),
+        dataAccessEndpoint="http://example2.com/api",
+        metadata={'dataCategory': ['PM counters']},
+        dataDeliveryModes=["ONE_TIME"]
+    )
+]
+
+    # 필터링
     if identity_namespace:
         dme_types = [dme_type for dme_type in dme_types if dme_type.dmeTypeDefinition.namespace == identity_namespace]
     if identity_name:
         dme_types = [dme_type for dme_type in dme_types if dme_type.dmeTypeDefinition.name == identity_name]
     if data_category:
-        dme_types = [dme_type for dme_type in dme_types if all(category in dme_type.metadata.dataCategory for category in data_category)]
+        dme_types = [dme_type for dme_type in dme_types if all(category in dme_type.metadata['dataCategory'] for category in data_category)]
 
-    # 필터링 후 결과 반환
+    # 결과 반환
     return jsonify([dme_type.to_dict() for dme_type in dme_types])  # 결과를 JSON 형태로 반환

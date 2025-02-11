@@ -63,6 +63,22 @@ class DmeTypeRelatedCapabilities(Model):
         """
         return util.deserialize_model(dikt, cls)
 
+    def __init__(self, registrationId, dmeTypeDefinition, dataAccessEndpoint, dataDeliveryModes, metadata=None):
+        self.registrationId = registrationId
+        self.dmeTypeDefinition = dmeTypeDefinition
+        self.dataAccessEndpoint = dataAccessEndpoint
+        self.dataDeliveryModes = dataDeliveryModes
+        self.metadata = metadata or {}
+
+    def to_dict(self):
+        return {
+            "registrationId": self.registrationId,
+            "dmeTypeDefinition": vars(self.dmeTypeDefinition),
+            "dataAccessEndpoint": self.dataAccessEndpoint,
+            "dataDeliveryModes": self.dataDeliveryModes,
+            "metadata": self.metadata
+        }
+
     @property
     def dme_type_definition(self) -> DmeTypeDefinition:
         """Gets the dme_type_definition of this DmeTypeRelatedCapabilities.

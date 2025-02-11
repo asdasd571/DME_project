@@ -14,15 +14,28 @@ class DmeTypeId(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self):  # noqa: E501
-        """DmeTypeId - a model defined in Swagger
+    def __init__(self, identity_namespace, identity_name, data_category):
+        self.identity_namespace = identity_namespace
+        self.identity_name = identity_name
+        self.data_category = data_category
 
-        """
-        self.swagger_types = {
-        }
+    @property
+    def namespace(self):
+        return self.identity_namespace
 
-        self.attribute_map = {
-        }
+    @property
+    def name(self):
+        return self.identity_name
+
+    # def __init__(self):  # noqa: E501
+    #     """DmeTypeId - a model defined in Swagger
+
+    #     """
+    #     self.swagger_types = {
+    #     }
+
+    #     self.attribute_map = {
+    #     }
 
     @classmethod
     def from_dict(cls, dikt) -> 'DmeTypeId':
