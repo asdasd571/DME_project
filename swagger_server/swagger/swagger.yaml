@@ -25,6 +25,13 @@ paths:
       - All data offers
       description: Allows to create a new data offer
       operationId: offers_post
+      parameters:
+        - name: "apiConsumerId"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+          description: "ID of the API consumer"
       requestBody:
         content:
           application/json:
@@ -137,13 +144,13 @@ paths:
       description: To delete the data offer
       operationId: offers_data_offer_id_delete
       parameters:
-      - name: dataOfferId
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
+        - name: dataOfferId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The identifier of the data offer to be deleted
+    
       responses:
         "204":
           description: The data offer was deleted.

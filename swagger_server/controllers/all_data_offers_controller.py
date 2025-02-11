@@ -1,36 +1,49 @@
 import connexion
 import six
-
+import json
+from flask import jsonify, request
 from swagger_server.models import DataOfferInfo  # noqa: E501
 from swagger_server import util
 
-
-import json
-from flask import jsonify
+data_offers = {} 
 
 def offers_post(body):  # noqa: E501
-    """offers_post
+    """Create an individual data offer"""
+    apiConsumerId = request.args.get('apiConsumerId')
+    if body is None:
+        return jsonify({"error": "Request body is required"}), 400
 
-    Allows to create a new data offer
+    try:
+        # JSON 변환 (bytes일 경우 처리)
+        if isinstance(body, bytes):
+            body = json.loads(body.decode('utf-8'))
 
-    :param body: 
-    :type body: dict | bytes
+        if not isinstance(body, dict):
+            return jsonify({"error": "Invalid input, JSON object required"}), 400
 
-    :rtype: DataOfferInfo
-    """
-    if isinstance(body, dict):  # body가 dict 타입일 경우
-        try:
-            data_offer_info = DataOfferInfo.from_dict(body)
-            return jsonify(data_offer_info.to_dict()), 201
-        except KeyError as e:
-            return jsonify({"error": f"Missing key: {str(e)}"}), 400
-    elif isinstance(body, bytes):  # body가 bytes일 경우
-        try:
-            body = json.loads(body.decode('utf-8'))  # JSON 디코딩
-            data_offer_info = DataOfferInfo.from_dict(body)
-            return jsonify(data_offer_info.to_dict()), 201
-        except (json.JSONDecodeError, KeyError) as e:
-            return jsonify({"error": f"Invalid or missing data: {str(e)}"}), 400
-    else:
-        return jsonify({"error": "Invalid input, JSON required."}), 400
+        # 필수 필드 확인
+        required_fields = ["dataOfferId"]
+        for field in required_fields:
+            if field not in body:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
 
+        data_offer_id = body["dataOfferId"]
+        data_offer_info = DataOfferInfo.from_dict(body)
+
+        # 저장
+        data_offers[data_offer_id] = data_offer_info
+
+        # 리소스 URI 생성
+        location_uri = f"/data-offer/v1/{apiConsumerId}/offers/{data_offer_id}"
+
+        response = jsonify(data_offer_info.to_dict())
+        response.status_code = 201
+        response.headers['Location'] = location_uri
+        return response
+
+    except json.JSONDecodeError:
+        return jsonify({"error": "Invalid JSON format"}), 400
+    except AttributeError as e:
+        return jsonify({"error": f"Unexpected data structure: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500

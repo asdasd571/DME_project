@@ -1,26 +1,23 @@
 import connexion
-import six
-
-from swagger_server import util
-
+import json
+from flask import request, jsonify
+from swagger_server.controllers.all_data_offers_controller import data_offers
+# 전역 변수 data_offers 정의
 
 def offers_data_offer_id_delete(data_offer_id):
-    """offers_data_offer_id_delete
+    """Delete a specific data offer based on offer ID"""
+    # data_offers에서 data_offer_id로 오퍼 찾기
+    if data_offer_id not in data_offers:
+        # 데이터 오퍼가 존재하지 않으면 404 반환
+        return jsonify({
+            "type": "https://example.com/probs/data-offer-not-found",
+            "title": "Data Offer Not Found",
+            "status": 404,
+            "detail": f"Data offer {data_offer_id} not found."
+        }), 404
 
-    To delete the data offer
+    # 해당 오퍼 삭제
+    del data_offers[data_offer_id]
 
-    :param data_offer_id: The identifier of the data offer to be deleted.
-    :type data_offer_id: str
-
-    :rtype: None
-    """
-    # 데이터 제공이 존재하는지 확인
-    if data_offer_id in data_offers:
-        # 데이터 제공 삭제
-        del data_offers[data_offer_id]
-        
-        # 204 No Content 응답 코드와 함께 성공적으로 삭제됨
-        return '', 204
-    else:
-        # 데이터 제공이 존재하지 않으면 404 Not Found 응답 코드 반환
-        return jsonify({"error": "Data offer not found"}), 404
+    # 204 No Content 반환
+    return '', 204
