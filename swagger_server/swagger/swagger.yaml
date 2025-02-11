@@ -1,0 +1,508 @@
+openapi: 3.0.3
+info:
+  title: Data access service
+  description: |
+    API for Data access service.
+    © 2024, O-RAN ALLIANCE.
+    All rights reserved.
+  version: 2.0.0-alpha.1
+externalDocs:
+  description: O-RAN.WG2.R1AP-v06.00
+  url: https://www.o-ran.org/specifications
+servers:
+- url: "{apiRoot}/data-access/v1/{apiConsumerId}"
+  variables:
+    apiRoot:
+      description: apiRoot as defined in clause 5.3 in O-RAN.WG2.R1AP
+      default: http://localhost:8080
+    apiConsumerId:
+      description: Identifier of the API consumer
+      default: ""
+paths:
+  /data-jobs:
+    post:
+      tags:
+      - Create all data jobs
+      description: To create a data job
+      operationId: data_jobs_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DataJobInfo"
+        required: true
+      responses:
+        "201":
+          description: Success case 201 created
+          headers:
+            Location:
+              description: Contains the URI of the newly created resource
+              required: true
+              style: simple
+              explode: false
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataJobInfo"
+        "400":
+          $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          $ref: "#/components/schemas/ProblemDetails"
+        "403":
+          $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/schemas/ProblemDetails"
+        "405":
+          $ref: "#/components/schemas/ProblemDetails"
+        "409":
+          $ref: "#/components/schemas/ProblemDetails"
+        "413":
+          $ref: "#/components/schemas/ProblemDetails"
+        "415":
+          $ref: "#/components/schemas/ProblemDetails"
+        "429":
+          $ref: "#/components/schemas/ProblemDetails"
+        "500":
+          $ref: "#/components/schemas/ProblemDetails"
+        "502":
+          $ref: "#/components/schemas/ProblemDetails"
+        "503":
+          $ref: "#/components/schemas/ProblemDetails"
+      callbacks:
+        DataAvailabilityNotification:
+          '{$request.body.dataAvailabilityNotificationUri}':
+            post:
+              description: Notification on the availability of requested data
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: "#/components/schemas/DataAvailabilityNotification"
+                required: true
+              responses:
+                "204":
+                  description: The notification was delivered
+                "400":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "401":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "403":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "404":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "429":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "500":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "502":
+                  $ref: "#/components/schemas/ProblemDetails"
+                "503":
+                  $ref: "#/components/schemas/ProblemDetails"
+      x-openapi-router-controller: swagger_server.controllers.create_all_data_jobs_controller
+  /data-jobs/{dataJobId}:
+    delete:
+      tags:
+      - Individual data job
+      description: To delete the created data job
+      operationId: data_jobs_data_job_id_delete
+      parameters:
+      - name: dataJobId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: "#/components/schemas/dataJobId"
+      responses:
+        "204":
+          description: The data job was deleted
+        "400":
+          $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          $ref: "#/components/schemas/ProblemDetails"
+        "403":
+          $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/schemas/ProblemDetails"
+        "429":
+          $ref: "#/components/schemas/ProblemDetails"
+        "500":
+          $ref: "#/components/schemas/ProblemDetails"
+        "502":
+          $ref: "#/components/schemas/ProblemDetails"
+        "503":
+          $ref: "#/components/schemas/ProblemDetails"
+      x-openapi-router-controller: swagger_server.controllers.individual_data_job_controller
+components:
+  schemas:
+    SchemaTypes:
+      type: string
+      description: Type of the schema supported by Data Producers
+      enum:
+      - JSON_SCHEMA
+      - XML_SCHEMA
+    DeliverySchema:
+      required:
+      - deliverySchemaId
+      - type
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/SchemaTypes"
+        deliverySchemaId:
+          type: string
+          description: A Data Producer may support one or more delivery schemas and
+            for each supported schema type a delivery schema identifier is assigned.
+            A Data Consumer uses this attribute while creating a data job and request
+            to deliver the data using specific schema type which is identified by
+            this attribute.
+        schema:
+          type: string
+          description: "The schema serialized to string. If this attribute is not\
+            \ present, the schema is assumed to be known from the DME type definition\
+            \ that is referenced by dmeTypeId"
+      description: Delivery schema for a DME type
+    Metadata:
+      required:
+      - dataCategory
+      properties:
+        dataCategory:
+          minItems: 1
+          type: array
+          description: "Defines the category of the DME type e.g., PM counters"
+          items:
+            type: string
+        rat:
+          minItems: 1
+          type: array
+          description: "Defines the radio access technology e.g., 5G"
+          items:
+            type: string
+      description: Metadata that can be used in discovering the DME type
+    DmeTypeIdStruct:
+      required:
+      - name
+      - namespace
+      - version
+      type: object
+      properties:
+        namespace:
+          type: string
+          description: Indicating the entity responsible for the DME type definition.
+        name:
+          pattern: "^[^:]{1,}$"
+          type: string
+          description: Name of the DME type. The string can be any character except
+            “:“ (colon)
+        version:
+          type: string
+          description: "Version of the DME type. The versioning and allowed characters\
+            \ are according to SemVer [11]"
+      description: Defining the attributes of DME type identifier
+    KafkaDeliveryConfiguration:
+      required:
+      - cleanUpPolicy
+      - compressionType
+      type: object
+      properties:
+        numPartitions:
+          type: integer
+          description: Number of partitions
+        cleanUpPolicy:
+          type: string
+          description: "cleanUpPolicy is based on cleanup.policy defined in the Kafka\
+            \ Documentation [15]."
+        compressionType:
+          type: string
+          description: "compressionType is based on compression.type defined in the\
+            \ Kafka Documentation [15]."
+        retentionBytes:
+          type: integer
+          description: "retentionBytes is based on retention.bytes defined in the\
+            \ Kafka Documentation [15]. This attribute is applicable ONLY when cleanUpPolicy\
+            \ is set to DELETE"
+        retentionMs:
+          type: integer
+          description: "retentionMs is based on retention.ms defined in the Kafka\
+            \ Documentation [15]. This attribute is applicable ONLY when cleanUpPolicy\
+            \ is set to DELETE"
+      description: These configuration will be applied if KAFKA_DATA_STREAM is selected
+        as delivery method
+    DataDeliveryMechanism:
+      required:
+      - dataDeliveryMethod
+      type: object
+      properties:
+        dataDeliveryMethod:
+          description: Delivery Method supported
+        kafkaDeliveryConfiguration:
+          $ref: "#/components/schemas/KafkaDeliveryConfiguration"
+      description: Defining the attributes of delivery mechanism supported
+      oneOf:
+      - required:
+        - kafkaDeliveryConfiguration
+    DataDeliveryMode:
+      type: string
+      description: This indicates whether the data instance is created in a one-time
+        data delivery (data request) or continuously (data subscription)
+      enum:
+      - ONE_TIME
+      - CONTINUOUS
+    SecurityMethod:
+      description: "Indicates the security method.  \nPossible values are:\n- PSK:\
+        \ Security method 1 (Using TLS-PSK) as described in 3GPP TS 33.122.\n- PKI:\
+        \ Security method 2 (Using PKI) as described in 3GPP TS 33.122.\n- OAUTH:\
+        \ Security method 3 (TLS with OAuth token) as described in 3GPP TS 33.122.\n"
+      anyOf:
+      - type: string
+        enum:
+        - PSK
+        - PKI
+        - OAUTH
+      - type: string
+        description: |
+          This string provides forward-compatibility with future extensions to the enumeration but is not used to encode content defined in the present version of this API.
+    InterfaceDescription:
+      type: object
+      properties:
+        ipv4Addr:
+          $ref: ./TS29122_CommonData.yaml#/components/schemas/Ipv4Addr
+        ipv6Addr:
+          $ref: ./TS29122_CommonData.yaml#/components/schemas/Ipv6Addr
+        fqdn:
+          $ref: ./TS29571_CommonData.yaml#/components/schemas/Fqdn
+        port:
+          $ref: ./TS29122_CommonData.yaml#/components/schemas/Port
+        apiPrefix:
+          type: string
+          description: |
+            A string representing a sequence of path segments that starts with the slash character.
+        securityMethods:
+          minItems: 1
+          type: array
+          description: |
+            Security methods supported by the interface, it takes precedence over the security methods provided in AefProfile, for this specific interface.
+          items:
+            $ref: "#/components/schemas/SecurityMethod"
+        grantTypes:
+          minItems: 1
+          type: array
+          items:
+            $ref: ./TS29222_CAPIF_Security_API.yaml#/components/schemas/OAuthGrantType
+      description: Represents the description of an API's interface.
+      oneOf:
+      - required:
+        - ipv4Addr
+      - required:
+        - ipv6Addr
+      - required:
+        - fqdn
+    dmeTypeId:
+      type: string
+      description: "The DmeTypeId is constructed based on the three parts separated\
+        \ by ':' (colon) {dmeTypeId} = {namespace}:{name}:{version}. See O-RAN.WG2.R1AP_DataRegistration.yaml#/components/schemas/DmeTypeIdStruct\
+        \ for the definition of “namespace“, “name“ and “version“."
+    DmeTypeDefinition:
+      title: DmeTypeDefinition
+      required:
+      - dataDeliveryMechanisms
+      - dataDeliverySchemas
+      - dmeTypeId
+      - metadata
+      type: object
+      properties:
+        dmeTypeId:
+          $ref: "#/components/schemas/DmeTypeIdStruct"
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+        dataProductionSchema:
+          title: dataProductionSchema
+          type: object
+          description: "Schema that defines the information necessary to formulate\
+            \ a data request or data subscription. If this attribute is not present,\
+            \ the schema is assumed to be known from the DME type definition that\
+            \ is referenced by dmeTypeId"
+        dataDeliverySchemas:
+          title: dataDeliverySchemas
+          type: array
+          description: List of delivery schemas supported by the producer for the
+            DME type being registered.
+          items:
+            $ref: "#/components/schemas/DeliverySchema"
+        dataDeliveryMechanisms:
+          title: dataDeliveryMechanisms
+          type: array
+          description: Defining the delivery mechanism supported by Data Producer
+          items:
+            $ref: "#/components/schemas/DataDeliveryMechanism"
+      description: Information of the DME type
+      example:
+        metadata:
+          rat:
+          - rat
+          - rat
+          dataCategory:
+          - dataCategory
+          - dataCategory
+        dmeTypeId:
+          namespace: namespace
+          name: name
+          version: version
+        dataDeliveryMechanisms:
+        - dataDeliveryMethod: ""
+          kafkaDeliveryConfiguration:
+            retentionMs: 1
+            retentionBytes: 6
+            cleanUpPolicy: cleanUpPolicy
+            numPartitions: 0
+            compressionType: compressionType
+        - dataDeliveryMethod: ""
+          kafkaDeliveryConfiguration:
+            retentionMs: 1
+            retentionBytes: 6
+            cleanUpPolicy: cleanUpPolicy
+            numPartitions: 0
+            compressionType: compressionType
+        dataProductionSchema: "{}"
+        dataDeliverySchemas:
+        - schema: schema
+          deliverySchemaId: deliverySchemaId
+          type: JSON_SCHEMA
+        - schema: schema
+          deliverySchemaId: deliverySchemaId
+          type: JSON_SCHEMA
+    registrationId:
+      type: string
+      description: A successful registration identified by registrationId
+    DmeTypeRelatedCapabilities:
+      title: DmeTypeRelatedCapabilities
+      required:
+      - dataAccessEndpoint
+      - dataDeliveryModes
+      - dmeTypeDefinition
+      - registrationId
+      type: object
+      properties:
+        dmeTypeDefinition:
+          $ref: "#/components/schemas/DmeTypeDefinition"
+        registrationId:
+          type: string
+          description: A successful registration identified by registrationId
+        constraints:
+          title: constraints
+          type: object
+          description: Formulates producer constraints or constraints applicable to
+            the consumption related to the DME type based on the dataProductionSchema
+        dataAccessEndpoint:
+          $ref: "#/components/schemas/InterfaceDescription"
+        dataDeliveryModes:
+          title: dataDeliveryModes
+          type: array
+          items:
+            $ref: "#/components/schemas/DataDeliveryMode"
+      description: Information related to the registration as producer of a DME type
+      example:
+        dmeTypeDefinition:
+          metadata:
+            rat:
+            - rat
+            - rat
+            dataCategory:
+            - dataCategory
+            - dataCategory
+          dmeTypeId:
+            namespace: namespace
+            name: name
+            version: version
+          dataDeliveryMechanisms:
+          - dataDeliveryMethod: ""
+            kafkaDeliveryConfiguration:
+              retentionMs: 1
+              retentionBytes: 6
+              cleanUpPolicy: cleanUpPolicy
+              numPartitions: 0
+              compressionType: compressionType
+          - dataDeliveryMethod: ""
+            kafkaDeliveryConfiguration:
+              retentionMs: 1
+              retentionBytes: 6
+              cleanUpPolicy: cleanUpPolicy
+              numPartitions: 0
+              compressionType: compressionType
+          dataProductionSchema: "{}"
+          dataDeliverySchemas:
+          - schema: schema
+            deliverySchemaId: deliverySchemaId
+            type: JSON_SCHEMA
+          - schema: schema
+            deliverySchemaId: deliverySchemaId
+            type: JSON_SCHEMA
+        registrationId: registrationId
+        dataDeliveryModes:
+        - ONE_TIME
+        - CONTINUOUS
+        dataAccessEndpoint:
+          ipv4Addr: ipv4Addr
+        constraints: {}
+    DataJobInfo:
+      title: DataJobInfo
+      type: object
+      properties:
+        dataAccessMethod:
+          type: string
+          description: Method used for data access
+        dataRequest:
+          type: object
+          properties:
+            dataType:
+              type: string
+              description: Type of data requested
+            dataCategory:
+              type: string
+              description: Category of data requested
+          description: Data requested
+          example:
+            dataCategory: dataCategory
+            dataType: dataType
+        dataAccessUri:
+          type: string
+          description: URI to access the data
+      example:
+        dataRequest:
+          dataCategory: dataCategory
+          dataType: dataType
+        dataAccessUri: dataAccessUri
+        dataAccessMethod: dataAccessMethod
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error.
+        title:
+          type: string
+          description: "A short, human-readable title of the error."
+        status:
+          type: integer
+          description: The HTTP status code generated by the server.
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of
+            the problem.
+        instance:
+          type: string
+          description: A unique instance identifier for the problem occurrence.
+      description: A description of the problem.
+    DataAvailabilityNotification:
+      type: object
+      properties:
+        notificationUri:
+          type: string
+          description: The URI where the notification can be delivered
+      description: Notification of data availability
+    dataJobId:
+      type: string
+      description: 'A successful created data job is identified by dataJobId '
+
