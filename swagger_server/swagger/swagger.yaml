@@ -292,12 +292,12 @@ components:
         to RFC 7807
     DataOfferInfo:
       required:
-      - “ dataDeliveryMethods “
-      - “dataDeliveryMode“
-      - “dataDeliverySchemaIds“
-      - “dataOfferTerminationNotificationUri“
-      - “dmeTypeId“
-      - “productionJobDefinition“
+      - dataDeliveryMethods
+      - dataDeliveryMode
+      - dataDeliverySchemaIds
+      - dataOfferTerminationNotificationUri
+      - dmeTypeId
+      - productionJobDefinition
       type: object
       properties:
         dataDeliveryMode:
