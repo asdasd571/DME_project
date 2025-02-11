@@ -15,16 +15,16 @@ class DataDeliveryMechanism(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, data_delivery_method: object=None, kafka_delivery_configuration: KafkaDeliveryConfiguration=None):  # noqa: E501
+    def __init__(self, data_delivery_method: Object=None, kafka_delivery_configuration: KafkaDeliveryConfiguration=None):  # noqa: E501
         """DataDeliveryMechanism - a model defined in Swagger
 
         :param data_delivery_method: The data_delivery_method of this DataDeliveryMechanism.  # noqa: E501
-        :type data_delivery_method: object
+        :type data_delivery_method: Object
         :param kafka_delivery_configuration: The kafka_delivery_configuration of this DataDeliveryMechanism.  # noqa: E501
         :type kafka_delivery_configuration: KafkaDeliveryConfiguration
         """
         self.swagger_types = {
-            'data_delivery_method': object,
+            'data_delivery_method': Object,
             'kafka_delivery_configuration': KafkaDeliveryConfiguration
         }
 
@@ -47,24 +47,24 @@ class DataDeliveryMechanism(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def data_delivery_method(self) -> object:
+    def data_delivery_method(self) -> Object:
         """Gets the data_delivery_method of this DataDeliveryMechanism.
 
         Delivery Method supported  # noqa: E501
 
         :return: The data_delivery_method of this DataDeliveryMechanism.
-        :rtype: object
+        :rtype: Object
         """
         return self._data_delivery_method
 
     @data_delivery_method.setter
-    def data_delivery_method(self, data_delivery_method: object):
+    def data_delivery_method(self, data_delivery_method: Object):
         """Sets the data_delivery_method of this DataDeliveryMechanism.
 
         Delivery Method supported  # noqa: E501
 
         :param data_delivery_method: The data_delivery_method of this DataDeliveryMechanism.
-        :type data_delivery_method: object
+        :type data_delivery_method: Object
         """
         if data_delivery_method is None:
             raise ValueError("Invalid value for `data_delivery_method`, must not be `None`")  # noqa: E501

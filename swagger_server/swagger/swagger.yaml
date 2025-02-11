@@ -14,7 +14,7 @@ servers:
   variables:
     apiRoot:
       description: apiRoot as defined in clause 5.3 in O-RAN.WG2.R1AP
-      default: http://localhost:8080
+      default: https://example.com
     apiConsumerId:
       description: Identifier of the API consumer
       default: ""
@@ -137,6 +137,48 @@ paths:
       x-openapi-router-controller: swagger_server.controllers.individual_data_job_controller
 components:
   schemas:
+    OAuthGrantType:
+      description: "Indicates the supported authorization flow (e.g. client credentials\
+        \ flow, authorization code         flow, etc.) to the API invoker.  \nPossible\
+        \ values are:\n- CLIENT_CREDENTIALS: Indicate that the grant type is is client\
+        \ credentials flow.\n- AUTHORIZATION_CODE: Indicate that the grant type is\
+        \ authorization code.\n- AUTHORIZATION_CODE_WITH_PKCE: Indicate that the grant\
+        \ type is authorization code with PKCE.\n"
+      anyOf:
+      - type: string
+        enum:
+        - CLIENT_CREDENTIALS
+        - AUTHORIZATION_CODE
+        - AUTHORIZATION_CODE_WITH_PKCE
+      - type: string
+        description: |
+          This string provides forward-compatibility with future extensions to the enumeration and is not used to encode content defined in the present version of this API.
+    Port:
+      maximum: 65535
+      minimum: 0
+      type: integer
+      description: Unsigned integer with valid values between 0 and 65535.
+    Fqdn:
+      maxLength: 253
+      minLength: 4
+      pattern: "^([0-9A-Za-z]([-0-9A-Za-z]{0,61}[0-9A-Za-z])?\\.)+[A-Za-z]{2,63}\\\
+        .?$"
+      type: string
+      description: Fully Qualified Domain Name
+    Ipv6Addr:
+      type: string
+      description: |
+        String identifying an IPv6 address formatted according to clause 4 of RFC5952. The mixed IPv4 IPv6 notation according to clause 5 of RFC5952 shall not be used.
+      example: 2001:db8:85a3::8a2e:370:7334
+      allOf:
+      - pattern: "^((:|(0?|([1-9a-f][0-9a-f]{0,3}))):)((0?|([1-9a-f][0-9a-f]{0,3})):){0,6}(:|(0?|([1-9a-f][0-9a-f]{0,3})))$"
+      - pattern: "^((([^:]+:){7}([^:]+))|((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?))$"
+    Ipv4Addr:
+      pattern: "^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$"
+      type: string
+      description: |
+        String identifying a IPv4 address formatted in the 'dotted decimal' notation as defined in RFC 1166.
+      example: 198.51.100.1
     SchemaTypes:
       type: string
       description: Type of the schema supported by Data Producers
@@ -268,13 +310,13 @@ components:
       type: object
       properties:
         ipv4Addr:
-          $ref: ./TS29122_CommonData.yaml#/components/schemas/Ipv4Addr
+          $ref: "#/components/schemas/Ipv4Addr"
         ipv6Addr:
-          $ref: ./TS29122_CommonData.yaml#/components/schemas/Ipv6Addr
+          $ref: "#/components/schemas/Ipv6Addr"
         fqdn:
-          $ref: ./TS29571_CommonData.yaml#/components/schemas/Fqdn
+          $ref: "#/components/schemas/Fqdn"
         port:
-          $ref: ./TS29122_CommonData.yaml#/components/schemas/Port
+          $ref: "#/components/schemas/Port"
         apiPrefix:
           type: string
           description: |
@@ -290,7 +332,7 @@ components:
           minItems: 1
           type: array
           items:
-            $ref: ./TS29222_CAPIF_Security_API.yaml#/components/schemas/OAuthGrantType
+            $ref: "#/components/schemas/OAuthGrantType"
       description: Represents the description of an API's interface.
       oneOf:
       - required:
@@ -454,18 +496,7 @@ components:
           type: string
           description: Method used for data access
         dataRequest:
-          type: object
-          properties:
-            dataType:
-              type: string
-              description: Type of data requested
-            dataCategory:
-              type: string
-              description: Category of data requested
-          description: Data requested
-          example:
-            dataCategory: dataCategory
-            dataType: dataType
+          $ref: "#/components/schemas/DataJobInfo_dataRequest"
         dataAccessUri:
           type: string
           description: URI to access the data
@@ -505,4 +536,17 @@ components:
     dataJobId:
       type: string
       description: 'A successful created data job is identified by dataJobId '
+    DataJobInfo_dataRequest:
+      type: object
+      properties:
+        dataType:
+          type: string
+          description: Type of data requested
+        dataCategory:
+          type: string
+          description: Category of data requested
+      description: Data requested
+      example:
+        dataCategory: dataCategory
+        dataType: dataType
 

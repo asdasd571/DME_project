@@ -6,12 +6,13 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.fqdn import Fqdn  # noqa: F401,E501
+from swagger_server.models.ipv4_addr import Ipv4Addr  # noqa: F401,E501
+from swagger_server.models.ipv6_addr import Ipv6Addr  # noqa: F401,E501
+from swagger_server.models.o_auth_grant_type import OAuthGrantType  # noqa: F401,E501
+from swagger_server.models.port import Port  # noqa: F401,E501
 from swagger_server.models.security_method import SecurityMethod  # noqa: F401,E501
-from swagger_server.models.ts29122_common_data_yamlcomponentsschemas_ipv4_addr import TS29122CommonDataYamlcomponentsschemasIpv4Addr  # noqa: F401,E501
-from swagger_server.models.ts29122_common_data_yamlcomponentsschemas_ipv6_addr import TS29122CommonDataYamlcomponentsschemasIpv6Addr  # noqa: F401,E501
-from swagger_server.models.ts29122_common_data_yamlcomponentsschemas_port import TS29122CommonDataYamlcomponentsschemasPort  # noqa: F401,E501
-from swagger_server.models.ts29222_capif_security_api_yamlcomponentsschemas_o_auth_grant_type import TS29222CAPIFSecurityAPIYamlcomponentsschemasOAuthGrantType  # noqa: F401,E501
-from swagger_server.models.ts29571_common_data_yamlcomponentsschemas_fqdn import TS29571CommonDataYamlcomponentsschemasFqdn  # noqa: F401,E501
+import re  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -20,32 +21,32 @@ class InterfaceDescription(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, ipv4_addr: TS29122CommonDataYamlcomponentsschemasIpv4Addr=None, ipv6_addr: TS29122CommonDataYamlcomponentsschemasIpv6Addr=None, fqdn: TS29571CommonDataYamlcomponentsschemasFqdn=None, port: TS29122CommonDataYamlcomponentsschemasPort=None, api_prefix: str=None, security_methods: List[SecurityMethod]=None, grant_types: List[TS29222CAPIFSecurityAPIYamlcomponentsschemasOAuthGrantType]=None):  # noqa: E501
+    def __init__(self, ipv4_addr: Ipv4Addr=None, ipv6_addr: Ipv6Addr=None, fqdn: Fqdn=None, port: Port=None, api_prefix: str=None, security_methods: List[SecurityMethod]=None, grant_types: List[OAuthGrantType]=None):  # noqa: E501
         """InterfaceDescription - a model defined in Swagger
 
         :param ipv4_addr: The ipv4_addr of this InterfaceDescription.  # noqa: E501
-        :type ipv4_addr: TS29122CommonDataYamlcomponentsschemasIpv4Addr
+        :type ipv4_addr: Ipv4Addr
         :param ipv6_addr: The ipv6_addr of this InterfaceDescription.  # noqa: E501
-        :type ipv6_addr: TS29122CommonDataYamlcomponentsschemasIpv6Addr
+        :type ipv6_addr: Ipv6Addr
         :param fqdn: The fqdn of this InterfaceDescription.  # noqa: E501
-        :type fqdn: TS29571CommonDataYamlcomponentsschemasFqdn
+        :type fqdn: Fqdn
         :param port: The port of this InterfaceDescription.  # noqa: E501
-        :type port: TS29122CommonDataYamlcomponentsschemasPort
+        :type port: Port
         :param api_prefix: The api_prefix of this InterfaceDescription.  # noqa: E501
         :type api_prefix: str
         :param security_methods: The security_methods of this InterfaceDescription.  # noqa: E501
         :type security_methods: List[SecurityMethod]
         :param grant_types: The grant_types of this InterfaceDescription.  # noqa: E501
-        :type grant_types: List[TS29222CAPIFSecurityAPIYamlcomponentsschemasOAuthGrantType]
+        :type grant_types: List[OAuthGrantType]
         """
         self.swagger_types = {
-            'ipv4_addr': TS29122CommonDataYamlcomponentsschemasIpv4Addr,
-            'ipv6_addr': TS29122CommonDataYamlcomponentsschemasIpv6Addr,
-            'fqdn': TS29571CommonDataYamlcomponentsschemasFqdn,
-            'port': TS29122CommonDataYamlcomponentsschemasPort,
+            'ipv4_addr': Ipv4Addr,
+            'ipv6_addr': Ipv6Addr,
+            'fqdn': Fqdn,
+            'port': Port,
             'api_prefix': str,
             'security_methods': List[SecurityMethod],
-            'grant_types': List[TS29222CAPIFSecurityAPIYamlcomponentsschemasOAuthGrantType]
+            'grant_types': List[OAuthGrantType]
         }
 
         self.attribute_map = {
@@ -77,85 +78,85 @@ class InterfaceDescription(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def ipv4_addr(self) -> TS29122CommonDataYamlcomponentsschemasIpv4Addr:
+    def ipv4_addr(self) -> Ipv4Addr:
         """Gets the ipv4_addr of this InterfaceDescription.
 
 
         :return: The ipv4_addr of this InterfaceDescription.
-        :rtype: TS29122CommonDataYamlcomponentsschemasIpv4Addr
+        :rtype: Ipv4Addr
         """
         return self._ipv4_addr
 
     @ipv4_addr.setter
-    def ipv4_addr(self, ipv4_addr: TS29122CommonDataYamlcomponentsschemasIpv4Addr):
+    def ipv4_addr(self, ipv4_addr: Ipv4Addr):
         """Sets the ipv4_addr of this InterfaceDescription.
 
 
         :param ipv4_addr: The ipv4_addr of this InterfaceDescription.
-        :type ipv4_addr: TS29122CommonDataYamlcomponentsschemasIpv4Addr
+        :type ipv4_addr: Ipv4Addr
         """
 
         self._ipv4_addr = ipv4_addr
 
     @property
-    def ipv6_addr(self) -> TS29122CommonDataYamlcomponentsschemasIpv6Addr:
+    def ipv6_addr(self) -> Ipv6Addr:
         """Gets the ipv6_addr of this InterfaceDescription.
 
 
         :return: The ipv6_addr of this InterfaceDescription.
-        :rtype: TS29122CommonDataYamlcomponentsschemasIpv6Addr
+        :rtype: Ipv6Addr
         """
         return self._ipv6_addr
 
     @ipv6_addr.setter
-    def ipv6_addr(self, ipv6_addr: TS29122CommonDataYamlcomponentsschemasIpv6Addr):
+    def ipv6_addr(self, ipv6_addr: Ipv6Addr):
         """Sets the ipv6_addr of this InterfaceDescription.
 
 
         :param ipv6_addr: The ipv6_addr of this InterfaceDescription.
-        :type ipv6_addr: TS29122CommonDataYamlcomponentsschemasIpv6Addr
+        :type ipv6_addr: Ipv6Addr
         """
 
         self._ipv6_addr = ipv6_addr
 
     @property
-    def fqdn(self) -> TS29571CommonDataYamlcomponentsschemasFqdn:
+    def fqdn(self) -> Fqdn:
         """Gets the fqdn of this InterfaceDescription.
 
 
         :return: The fqdn of this InterfaceDescription.
-        :rtype: TS29571CommonDataYamlcomponentsschemasFqdn
+        :rtype: Fqdn
         """
         return self._fqdn
 
     @fqdn.setter
-    def fqdn(self, fqdn: TS29571CommonDataYamlcomponentsschemasFqdn):
+    def fqdn(self, fqdn: Fqdn):
         """Sets the fqdn of this InterfaceDescription.
 
 
         :param fqdn: The fqdn of this InterfaceDescription.
-        :type fqdn: TS29571CommonDataYamlcomponentsschemasFqdn
+        :type fqdn: Fqdn
         """
 
         self._fqdn = fqdn
 
     @property
-    def port(self) -> TS29122CommonDataYamlcomponentsschemasPort:
+    def port(self) -> Port:
         """Gets the port of this InterfaceDescription.
 
 
         :return: The port of this InterfaceDescription.
-        :rtype: TS29122CommonDataYamlcomponentsschemasPort
+        :rtype: Port
         """
         return self._port
 
     @port.setter
-    def port(self, port: TS29122CommonDataYamlcomponentsschemasPort):
+    def port(self, port: Port):
         """Sets the port of this InterfaceDescription.
 
 
         :param port: The port of this InterfaceDescription.
-        :type port: TS29122CommonDataYamlcomponentsschemasPort
+        :type port: Port
         """
 
         self._port = port
@@ -207,22 +208,22 @@ class InterfaceDescription(Model):
         self._security_methods = security_methods
 
     @property
-    def grant_types(self) -> List[TS29222CAPIFSecurityAPIYamlcomponentsschemasOAuthGrantType]:
+    def grant_types(self) -> List[OAuthGrantType]:
         """Gets the grant_types of this InterfaceDescription.
 
 
         :return: The grant_types of this InterfaceDescription.
-        :rtype: List[TS29222CAPIFSecurityAPIYamlcomponentsschemasOAuthGrantType]
+        :rtype: List[OAuthGrantType]
         """
         return self._grant_types
 
     @grant_types.setter
-    def grant_types(self, grant_types: List[TS29222CAPIFSecurityAPIYamlcomponentsschemasOAuthGrantType]):
+    def grant_types(self, grant_types: List[OAuthGrantType]):
         """Sets the grant_types of this InterfaceDescription.
 
 
         :param grant_types: The grant_types of this InterfaceDescription.
-        :type grant_types: List[TS29222CAPIFSecurityAPIYamlcomponentsschemasOAuthGrantType]
+        :type grant_types: List[OAuthGrantType]
         """
 
         self._grant_types = grant_types
