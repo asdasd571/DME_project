@@ -1,0 +1,678 @@
+openapi: 3.0.3
+info:
+  title: Data discovery service
+  description: |
+    API for Data discovery service.
+    © 2024, O-RAN ALLIANCE.
+    All rights reserved.
+  version: 2.0.0-alpha.1
+externalDocs:
+  description: O-RAN.WG2.R1AP-v06.00
+  url: https://www.o-ran.org/specifications
+servers:
+- url: "{apiRoot}/data-discovery/v2/"
+  variables:
+    apiRoot:
+      description: apiRoot as defined in clause 5.3 in O-RAN.WG2.R1AP
+      default: http://localhost:8080
+paths:
+  /dme-types:
+    get:
+      description: To discover the available DME types
+      operationId: dme_types_get
+      parameters:
+      - name: identity_namespace
+        in: query
+        description: Identity namespace to match the “namespace“ part of the “dmeTypeId“
+          attribute
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: identity_name
+        in: query
+        description: Identity name to match the “name“ part of the “dmeTypeId“ attribute.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: data_category
+        in: query
+        description: "Set of data category entries, all of which to match entries\
+          \ of the “dataCategory“ attribute."
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: The response body contains the result of the search over the
+            list of registered APIs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DmeTypeRelatedCapabilities"
+                x-content-type: application/json
+        "400":
+          $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          $ref: "#/components/schemas/ProblemDetails"
+        "403":
+          $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/schemas/ProblemDetails"
+        "406":
+          $ref: "#/components/schemas/ProblemDetails"
+        "414":
+          $ref: "#/components/schemas/ProblemDetails"
+        "429":
+          $ref: "#/components/schemas/ProblemDetails"
+        "500":
+          $ref: "#/components/schemas/ProblemDetails"
+        "502":
+          $ref: "#/components/schemas/ProblemDetails"
+        "503":
+          $ref: "#/components/schemas/ProblemDetails"
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /dme-types/{dmeTypeId}:
+    get:
+      description: To obtain information about an individual DME type.
+      operationId: dme_types_dme_type_id_get
+      parameters:
+      - name: dmeTypeId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          $ref: "#/components/schemas/dmeTypeId"
+      responses:
+        "200":
+          description: The response body contains information about the DME type.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "400":
+          $ref: "#/components/schemas/ProblemDetails"
+        "401":
+          $ref: "#/components/schemas/ProblemDetails"
+        "403":
+          $ref: "#/components/schemas/ProblemDetails"
+        "404":
+          $ref: "#/components/schemas/ProblemDetails"
+        "406":
+          $ref: "#/components/schemas/ProblemDetails"
+        "414":
+          $ref: "#/components/schemas/ProblemDetails"
+        "429":
+          $ref: "#/components/schemas/ProblemDetails"
+        "500":
+          $ref: "#/components/schemas/ProblemDetails"
+        "502":
+          $ref: "#/components/schemas/ProblemDetails"
+        "503":
+          $ref: "#/components/schemas/ProblemDetails"
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas:
+    dmeTypeId:
+      type: string
+      description: "The DmeTypeId is constructed based on the three parts separated\
+        \ by “:“ (colon) {dmeTypeId} = {namespace}:{name}:{version}. See O-RAN.WG2.R1AP_DataRegistration.yaml#/components/schemas/DmeTypeIdStruct\
+        \ for the definition of “namespace“, “name“ and “version“."
+    registrationId:
+      type: string
+      description: 'A successful registration identified by registrationId '
+    DmeTypeRelatedCapabilities:
+      title: DmeTypeRelatedCapabilities
+      required:
+      - dataAccessEndpoint
+      - dataDeliveryModes
+      - dmeTypeDefinition
+      - registrationId
+      type: object
+      properties:
+        dmeTypeDefinition:
+          $ref: "#/components/schemas/DmeTypeDefinition"
+        registrationId:
+          type: string
+          description: 'A successful registration identified by registrationId '
+        constraints:
+          title: constraints
+          type: object
+          description: Formulates producer constraints or constraints applicable to
+            the consumption related to the DME type based on the dataProductionSchema
+        dataAccessEndpoint:
+          $ref: "#/components/schemas/InterfaceDescription"
+        dataDeliveryModes:
+          title: dataDeliveryModes
+          type: array
+          items:
+            $ref: "#/components/schemas/DataDeliveryMode"
+      description: Information related to the registration as producer of a DME type
+      example:
+        dmeTypeDefinition:
+          metadata:
+            rat:
+            - rat
+            - rat
+            dataCategory:
+            - dataCategory
+            - dataCategory
+          dmeTypeId:
+            namespace: namespace
+            name: name
+            version: version
+          dataDeliveryMechanisms:
+          - dataDeliveryMethod: ""
+            kafkaDeliveryConfiguration:
+              retentionMs: 1
+              retentionBytes: 6
+              cleanUpPolicy: cleanUpPolicy
+              numPartitions: 0
+              compressionType: compressionType
+          - dataDeliveryMethod: ""
+            kafkaDeliveryConfiguration:
+              retentionMs: 1
+              retentionBytes: 6
+              cleanUpPolicy: cleanUpPolicy
+              numPartitions: 0
+              compressionType: compressionType
+          dataProductionSchema: "{}"
+          dataDeliverySchemas:
+          - schema: schema
+            deliverySchemaId: deliverySchemaId
+            type: JSON_SCHEMA
+          - schema: schema
+            deliverySchemaId: deliverySchemaId
+            type: JSON_SCHEMA
+        dataDeliveryModes:
+        - ONE_TIME
+        - ONE_TIME
+        dataAccessEndpoint:
+          ipv6Addr: ipv6Addr
+          grantTypes:
+          - CLIENT_CREDENTIALS
+          - CLIENT_CREDENTIALS
+          securityMethods:
+          - PSK
+          - PSK
+          fqdn: fqdn
+          port: 39072
+          apiPrefix: apiPrefix
+          ipv4Addr: ipv4Addr
+        constraints: "{}"
+    DmeTypeDefinition:
+      title: DmeTypeDefinition
+      required:
+      - dataDeliveryMechanisms
+      - dataDeliverySchemas
+      - dmeTypeId
+      - metadata
+      type: object
+      properties:
+        dmeTypeId:
+          $ref: "#/components/schemas/DmeTypeIdStruct"
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+        dataProductionSchema:
+          title: dataProductionSchema
+          type: object
+          description: "Schema that defines the information necessary to formulate\
+            \ a data request or data subscription.   If this attribute is not present,\
+            \ the schema is assumed to be known from the DME type definition that\
+            \ is referenced by dmeTypeId"
+        dataDeliverySchemas:
+          title: dataDeliverySchemas
+          type: array
+          description: List of delivery schemas supported by the producer for the
+            DME type being registered.
+          items:
+            $ref: "#/components/schemas/DeliverySchema"
+        dataDeliveryMechanisms:
+          title: dataDeliveryMechanisms
+          type: array
+          description: 'Defining the delivery mechanism supported by Data Producer '
+          items:
+            $ref: "#/components/schemas/DataDeliveryMechanism"
+      description: Information of the DME type
+      example:
+        metadata:
+          rat:
+          - rat
+          - rat
+          dataCategory:
+          - dataCategory
+          - dataCategory
+        dmeTypeId:
+          namespace: namespace
+          name: name
+          version: version
+        dataDeliveryMechanisms:
+        - dataDeliveryMethod: ""
+          kafkaDeliveryConfiguration:
+            retentionMs: 1
+            retentionBytes: 6
+            cleanUpPolicy: cleanUpPolicy
+            numPartitions: 0
+            compressionType: compressionType
+        - dataDeliveryMethod: ""
+          kafkaDeliveryConfiguration:
+            retentionMs: 1
+            retentionBytes: 6
+            cleanUpPolicy: cleanUpPolicy
+            numPartitions: 0
+            compressionType: compressionType
+        dataProductionSchema: "{}"
+        dataDeliverySchemas:
+        - schema: schema
+          deliverySchemaId: deliverySchemaId
+          type: JSON_SCHEMA
+        - schema: schema
+          deliverySchemaId: deliverySchemaId
+          type: JSON_SCHEMA
+    DmeTypeIdStruct:
+      title: DmeTypeIdStruct
+      required:
+      - name
+      - namespace
+      - version
+      type: object
+      properties:
+        namespace:
+          title: namespace
+          type: string
+          description: Indicating the entity responsible for the DME type definition.
+        name:
+          title: name
+          pattern: "^[^:]{1,}$"
+          type: string
+          description: Name of the DME type. The string can be any character except
+            “:“ (colon)
+        version:
+          title: version
+          type: string
+          description: "Version of the DME type. The versioning and allowed characters\
+            \ are according to SemVer [11]"
+      description: Defining the attributes of DME type identifier
+      example:
+        namespace: namespace
+        name: name
+        version: version
+    DeliverySchema:
+      title: DeliverySchema
+      required:
+      - deliverySchemaId
+      - type
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/SchemaTypes"
+        deliverySchemaId:
+          title: deliverySchemaId
+          type: string
+          description: A Data Producer may support one or more delivery schemas and
+            for each supported schema type a delivery schema identifier is assigned.
+            A Data Consumer uses this attribute while creating a data job and request
+            to deliver the data using specific schema type which is identified by
+            this attribute.
+        schema:
+          title: schema
+          type: string
+          description: "The schema serialized to string. If this attribute is not\
+            \ present, the schema is assumed to be known from the DME type definition\
+            \ that is referenced by dmeTypeId"
+      description: Delivery schema for a DME type
+      example:
+        schema: schema
+        deliverySchemaId: deliverySchemaId
+        type: JSON_SCHEMA
+    DataDeliveryMechanism:
+      title: DataDeliveryMechanism
+      required:
+      - dataDeliveryMethod
+      type: object
+      properties:
+        dataDeliveryMethod:
+          title: dataDeliveryMethod
+          description: Delivery Method supported
+        kafkaDeliveryConfiguration:
+          $ref: "#/components/schemas/KafkaDeliveryConfiguration"
+      description: Defining the attributes of delivery mechanism supported
+      nullable: true
+      example:
+        dataDeliveryMethod: ""
+        kafkaDeliveryConfiguration:
+          retentionMs: 1
+          retentionBytes: 6
+          cleanUpPolicy: cleanUpPolicy
+          numPartitions: 0
+          compressionType: compressionType
+    Metadata:
+      title: Metadata
+      required:
+      - dataCategory
+      properties:
+        dataCategory:
+          title: dataCategory
+          minItems: 1
+          type: array
+          description: "Defines the category of the DME type e.g., PM counters"
+          items:
+            type: string
+        rat:
+          title: rat
+          minItems: 1
+          type: array
+          description: "Defines the radio access technology e.g., 5G"
+          items:
+            type: string
+      description: Metadata that can be used in discovering the DME type
+      example:
+        rat:
+        - rat
+        - rat
+        dataCategory:
+        - dataCategory
+        - dataCategory
+    SchemaTypes:
+      title: SchemaTypes
+      type: string
+      description: Type of the schema supported by Data Producers
+      enum:
+      - JSON_SCHEMA
+      - XML_SCHEMA
+    KafkaDeliveryConfiguration:
+      title: KafkaDeliveryConfiguration
+      required:
+      - cleanUpPolicy
+      - compressionType
+      type: object
+      properties:
+        numPartitions:
+          title: numPartitions
+          type: integer
+          description: Number of partitions
+        cleanUpPolicy:
+          title: cleanUpPolicy
+          type: string
+          description: "cleanUpPolicy is based on cleanup.policy defined in the Kafka\
+            \ Documentation [15]. "
+        compressionType:
+          title: compressionType
+          type: string
+          description: " compressionType is based on compression.type defined in the\
+            \ Kafka Documentation [15] ."
+        retentionBytes:
+          title: retentionBytes
+          type: integer
+          description: " retentionBytes is based on retention.bytes defined in the\
+            \ Kafka Documentation [15] . This attribute is applicable ONLY when cleanUpPolicy\
+            \ is set to DELETE"
+        retentionMs:
+          title: retentionMs
+          type: integer
+          description: " retentionMs is based on retention.ms defined in the Kafka\
+            \ Documentation [15] . This attribute is applicable ONLY when cleanUpPolicy\
+            \ is set to DELETE"
+      description: These configuration will be applied if KAFKA_DATA_STREAM is selected
+        as delivery method
+      example:
+        retentionMs: 1
+        retentionBytes: 6
+        cleanUpPolicy: cleanUpPolicy
+        numPartitions: 0
+        compressionType: compressionType
+    ProblemDetails:
+      title: ProblemDetails
+      type: object
+      properties:
+        type:
+          title: type
+          type: string
+          description: a URI reference according to IETF RFC 3986 that identifies
+            the problem type
+        title:
+          title: title
+          type: string
+          description: human-readable summary of the problem type
+        status:
+          title: status
+          type: number
+          description: the HTTP status code
+        detail:
+          title: detail
+          type: string
+          description: 'human-readable explanation '
+        instance:
+          title: instance
+          type: string
+          description: URI reference that identifies the specific occurrence of the
+            problem
+      description: A problem detail to carry details in an HTTP response according
+        to RFC 7807
+      example:
+        instance: instance
+        detail: detail
+        type: type
+        title: title
+        status: 0.8008281904610115
+    InterfaceDescription:
+      title: InterfaceDescription
+      type: object
+      properties:
+        ipv4Addr:
+          title: Ipv4Addr
+          type: string
+          description: |
+            string identifying a Ipv4 address formatted in the "dotted decimal" notation as defined in IETF RFC 1166.
+        ipv6Addr:
+          title: Ipv6Addr
+          type: string
+          description: |
+            string identifying a Ipv6 address formatted according to clause 4 in IETF RFC 5952. The mixed Ipv4 Ipv6 notation according to clause 5 of IETF RFC 5952 shall not be used.
+        fqdn:
+          title: Fqdn
+          maxLength: 253
+          minLength: 4
+          pattern: "^([0-9A-Za-z]([-0-9A-Za-z]{0,61}[0-9A-Za-z])?\\.)+[A-Za-z]{2,63}\\\
+            .?$"
+          type: string
+          description: Fully Qualified Domain Name
+        port:
+          title: Port
+          maximum: 65535
+          minimum: 0
+          type: integer
+          description: Unsigned integer with valid values between 0 and 65535.
+        apiPrefix:
+          title: apiPrefix
+          type: string
+          description: |
+            A string representing a sequence of path segments that starts with the slash character.
+        securityMethods:
+          title: securityMethods
+          minItems: 1
+          type: array
+          description: |
+            Security methods supported by the interface, it take precedence over the security methods provided in AefProfile, for this specific interface.
+          items:
+            $ref: "#/components/schemas/SecurityMethod"
+        grantTypes:
+          title: grantTypes
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/OAuthGrantType"
+      description: Represents the description of an API's interface.
+      nullable: true
+      example:
+        ipv6Addr: ipv6Addr
+        grantTypes:
+        - CLIENT_CREDENTIALS
+        - CLIENT_CREDENTIALS
+        securityMethods:
+        - PSK
+        - PSK
+        fqdn: fqdn
+        port: 39072
+        apiPrefix: apiPrefix
+        ipv4Addr: ipv4Addr
+    SecurityMethod:
+      title: SecurityMethod
+      description: "Indicates the security method.  \nPossible values are:\n- PSK:\
+        \ Security method 1 (Using TLS-PSK) as described in 3GPP TS 33.122.\n- PKI:\
+        \ Security method 2 (Using PKI) as described in 3GPP TS 33.122.\n- OAUTH:\
+        \ Security method 3 (TLS with OAuth token) as described in 3GPP TS 33.122.\n"
+      anyOf:
+      - type: string
+        enum:
+        - PSK
+        - PKI
+        - OAUTH
+      - type: string
+        description: |
+          This string provides forward-compatibility with future extensions to the enumeration but is not used to encode content defined in the present version of this API.
+    DataDeliveryMode:
+      title: DataDeliveryMode
+      type: string
+      description: This indicates whether the data instance is created in a one-time
+        data delivery (data request) or continuously (data subscription)
+      enum:
+      - ONE_TIME
+      - CONTINUOUS
+    Ipv4Addr:
+      title: Ipv4Addr
+      type: string
+      description: |
+        string identifying a Ipv4 address formatted in the "dotted decimal" notation as defined in IETF RFC 1166.
+    Ipv6Addr:
+      title: Ipv6Addr
+      type: string
+      description: |
+        string identifying a Ipv6 address formatted according to clause 4 in IETF RFC 5952. The mixed Ipv4 Ipv6 notation according to clause 5 of IETF RFC 5952 shall not be used.
+    Fqdn:
+      title: Fqdn
+      maxLength: 253
+      minLength: 4
+      pattern: "^([0-9A-Za-z]([-0-9A-Za-z]{0,61}[0-9A-Za-z])?\\.)+[A-Za-z]{2,63}\\\
+        .?$"
+      type: string
+      description: Fully Qualified Domain Name
+    Port:
+      title: Port
+      maximum: 65535
+      minimum: 0
+      type: integer
+      description: Unsigned integer with valid values between 0 and 65535.
+    OAuthGrantType:
+      title: OAuthGrantType
+      description: "Indicates the supported authorization flow (e.g. client credentials\
+        \ flow, authorization code         flow, etc.) to the API invoker.  \nPossible\
+        \ values are:\n- CLIENT_CREDENTIALS: Indicate that the grant type is is client\
+        \ credentials flow.\n- AUTHORIZATION_CODE: Indicate that the grant type is\
+        \ authorization code.\n- AUTHORIZATION_CODE_WITH_PKCE: Indicate that the grant\
+        \ type is authorization code with PKCE.\n"
+      anyOf:
+      - type: string
+        enum:
+        - CLIENT_CREDENTIALS
+        - AUTHORIZATION_CODE
+        - AUTHORIZATION_CODE_WITH_PKCE
+      - type: string
+        description: |
+          This string provides forward-compatibility with future extensions to the enumeration and is not used to encode content defined in the present version of this API.
+  responses:
+    "400":
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "401":
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "403":
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "404":
+      description: Not Found
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "405":
+      description: Method Not Allowed
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "406":
+      description: Not Acceptable
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "409":
+      description: Conflict
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "411":
+      description: Length Required
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "413":
+      description: Payload Too Large
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "415":
+      description: Unsupported Media Type
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "429":
+      description: Too Many Requests
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "500":
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "502":
+      description: Bad Gateway
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    "503":
+      description: Service Unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+
