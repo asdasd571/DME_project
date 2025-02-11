@@ -1,12 +1,11 @@
 import connexion
 import six
 
-from swagger_server.models.data_job_info import DataJobInfo  # noqa: E501
 from swagger_server import util
 
 
 from flask import jsonify
-from ..models import DataJobInfo  # DataJobInfo 모델을 가져오는 가정
+from swagger_server.models import DataJobInfo  # DataJobInfo 모델을 가져오는 가정
 
 def data_jobs_post(body):  # noqa: E501
     """data_jobs_post

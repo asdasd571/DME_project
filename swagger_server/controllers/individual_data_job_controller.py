@@ -1,12 +1,11 @@
 import connexion
 import six
 
-from swagger_server.models.data_job_id import DataJobId  # noqa: E501
 from swagger_server import util
 
 from flask import jsonify
-from models import DataJobId  # DataJobId 모델을 가져오는 가정
-from database import db  # 데이터베이스 관련 객체 (예시)
+from swagger_server.models import DataJobId  # DataJobId 모델을 가져오는 가정
+# from database import db  # 데이터베이스 관련 객체 (예시)
 
 def data_jobs_data_job_id_delete(data_job_id):  # noqa: E501
     """data_jobs_data_job_id_delete

@@ -14,7 +14,7 @@ servers:
   variables:
     apiRoot:
       description: apiRoot as defined in clause 5.3 in O-RAN.WG2.R1AP
-      default: https://example.com
+      default: http://localhost:8080
     apiConsumerId:
       description: Identifier of the API consumer
       default: ""
