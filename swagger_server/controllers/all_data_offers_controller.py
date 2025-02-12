@@ -36,7 +36,11 @@ def offers_post(body):  # noqa: E501
         # 리소스 URI 생성
         location_uri = f"/data-offer/v1/{apiConsumerId}/offers/{data_offer_id}"
 
-        response = jsonify(data_offer_info.to_dict())
+        # 응답에 dataOfferId 포함
+        response_data = data_offer_info.to_dict()
+        response_data["dataOfferId"] = data_offer_id  # dataOfferId를 응답에 추가
+
+        response = jsonify(response_data)
         response.status_code = 201
         response.headers['Location'] = location_uri
         return response
