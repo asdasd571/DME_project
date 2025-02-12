@@ -34,7 +34,7 @@ def production_capabilities_registration_id_delete(registration_id):  # noqa: E5
         # 실제 삭제 작업 수행
         deleted = delete_production_capabilities_by_id(registration_id)
         if deleted:
-            return {"message": "Production capabilities deleted successfully"}, 200
+            return {"message": "Production capabilities deleted successfully"}, 204
         else:
             return {"error": "Not found"}, 404
     except Exception as e:
