@@ -1,11 +1,10 @@
 import connexion
-import six
-
+import uuid
 from swagger_server import util
-
-
 from flask import jsonify
 from swagger_server.models import DataJobInfo  # DataJobInfo 모델을 가져오는 가정
+
+data_job_db = {}
 
 def data_jobs_post(body):  # noqa: E501
     """data_jobs_post
@@ -15,16 +14,22 @@ def data_jobs_post(body):  # noqa: E501
     :param body: The data job details provided in the request body.
     :type body: dict | bytes
 
-    :rtype: DataJobInfo
+    :rtype: dict
     """
-    if connexion.request.is_json:
-        body = DataJobInfo.from_dict(connexion.request.get_json())  # JSON을 DataJobInfo 객체로 변환
-        
-        # 데이터 작업을 생성하는 로직 (여기서 실제 데이터 작업을 처리하고 저장해야 함)
-        # 예: db.create_data_job(body) 또는 관련 로직 추가
-        
-        # 예시로 반환하는 DataJobInfo 객체를 JSON 형식으로 반환
-        return jsonify(body.to_dict()), 201  # HTTP 201 Created 응답과 함께 DataJobInfo 반환
+    # JSON을 DataJobInfo 객체로 변환
+    body = DataJobInfo.from_dict(connexion.request.get_json())  
+    
+    # 새로운 data_job_id 생성 (예: UUID 사용)
+    data_job_id = str(uuid.uuid4())  # 고유한 ID 생성
 
-    # JSON 형식이 아닐 경우 잘못된 요청 처리
-    return jsonify({"error": "Invalid input, JSON expected"}), 400
+    # body 객체에 data_job_id 추가
+    body.data_job_id = data_job_id  # 객체에 ID 추가
+
+    # 임시 저장소에 데이터 저장
+    data_job_db[data_job_id] = body.to_dict()  # data_job_id를 키로 사용하여 저장
+
+    # dataJobInfo와 data_job_id를 함께 반환
+    return jsonify({
+        "dataJobInfo": body.to_dict(),
+        "data_job_id": data_job_id
+    }), 201  # HTTP 201 Created 응답과 함께 반환
